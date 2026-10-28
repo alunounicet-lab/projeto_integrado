@@ -1,97 +1,49 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#123b35">
-  <meta name="description" content="Descubra, divulgue e organize eventos em um só lugar.">
-  <title>Conecta Eventos — descubra o que acontece</title>
-  <link rel="preconnect" href="https://unpkg.com">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="/styles.css">
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script defer src="/app.js"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff7f3">
+  <meta name="description" content="Descubra, organize e participe de eventos com o EventSync.">
+  <title>EventSync — Descubra, organize e participe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css"><script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script defer src="app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Pular para o conteúdo</a>
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="Conecta Eventos, página inicial"><span class="brand-mark" aria-hidden="true">✳</span> conecta<span>eventos</span></a>
-    <nav aria-label="Navegação principal">
-      <a href="#eventos">Explorar eventos</a>
-      <a href="#criar">Organizar evento</a>
-    </nav>
-    <a class="header-cta" href="#criar">+ Criar evento</a>
+  <header class="site-header wrap">
+    <a class="brand" href="#explorar" aria-label="EventSync, explorar eventos"><span class="brand-icon" aria-hidden="true">▣</span>eventsync<span class="brand-dot">.</span></a>
+    <nav class="desktop-nav" aria-label="Navegação principal"><a href="#explorar" data-nav="explorar">Explorar</a><a href="#meus" data-nav="meus">Meus Eventos</a></nav>
+    <div class="header-actions"><button id="bell-button" class="icon-button" type="button" aria-label="Notificações" aria-expanded="false" aria-controls="notification-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9M10 21h4"/></svg><span id="bell-count" class="bell-count" hidden>0</span></button><a class="button button-primary header-create" href="#criar">+ Criar evento</a></div>
+    <section id="notification-panel" class="notification-panel" aria-label="Notificações" hidden><div class="notification-head"><h2>Notificações</h2><button id="close-notifications" type="button" class="close-button" aria-label="Fechar notificações">×</button></div><div id="notification-list"></div><button id="mark-read" class="text-button" type="button">Marcar todas como lidas</button></section>
   </header>
-
-  <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> SUA CIDADE, EM MOVIMENTO</p>
-        <h1 id="hero-title">Encontre seu<br><span>próximo encontro.</span></h1>
-        <p class="hero-text">Cultura, ideias e pessoas. Descubra eventos que fazem a cidade acontecer ou crie o seu.</p>
-        <a class="primary-button" href="#eventos">Explorar eventos <span aria-hidden="true">↗</span></a>
-        <div class="hero-meta"><span aria-hidden="true">◉</span> Eventos públicos e privados, em um só lugar</div>
-      </div>
-      <div class="hero-art" aria-label="Ilustração abstrata de pessoas se reunindo em um evento">
-        <div class="art-sun"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
-        <div class="art-card card-top"><span>✦</span><div><strong>Boas ideias</strong><small>merecem encontros.</small></div></div>
-        <div class="art-figure figure-one"><i></i><b></b></div><div class="art-figure figure-two"><i></i><b></b></div><div class="art-figure figure-three"><i></i><b></b></div>
-        <div class="art-card card-bottom"><span class="tiny-pin">⌖</span><div><strong>Bem perto de você</strong><small>Descubra novos lugares</small></div></div>
-        <span class="art-spark spark-one" aria-hidden="true">✳</span><span class="art-spark spark-two" aria-hidden="true">✦</span>
-      </div>
+  <main id="main" tabindex="-1">
+    <section id="view-explorar" class="view wrap" aria-labelledby="hero-title">
+      <div class="hero"><span class="hero-eyebrow">DESCUBRA O QUE VEM POR AÍ</span><h1 id="hero-title">Seu próximo rolê começa <span>aqui!</span></h1><p>Shows, encontros, workshops e experiências para você aproveitar.</p><label class="search-box" for="search"><span aria-hidden="true">⌕</span><span class="sr-only">Buscar eventos por título, local ou categoria</span><input id="search" type="search" autocomplete="off" placeholder="Qual evento você procura?"></label></div>
+      <div id="category-chips" class="chips" role="group" aria-label="Filtrar por categoria"></div>
+      <div class="section-heading"><div><h2>Eventos em destaque <span>✦</span></h2><p>Encontre uma experiência para chamar de sua.</p></div><span id="result-count" aria-live="polite"></span></div><div id="event-list" class="event-grid" aria-live="polite"></div>
     </section>
-
-    <section class="content-section" id="eventos" aria-labelledby="events-heading">
-      <div class="section-heading">
-        <div><p class="eyebrow">AGENDA DA COMUNIDADE</p><h2 id="events-heading">Acontece por aqui</h2><p class="section-subtitle">Escolha seu próximo programa.</p></div>
-        <span class="result-count" id="result-count" aria-live="polite">Carregando eventos…</span>
-      </div>
-      <div class="toolbar">
-        <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Buscar eventos</span><input id="search" type="search" placeholder="Buscar por evento, local ou categoria"></label>
-        <label class="filter-label" for="category-filter">Categoria</label>
-        <select id="category-filter"><option value="">Todas as categorias</option></select>
-      </div>
-      <div id="event-list" class="event-grid" aria-live="polite"><p class="muted">Carregando eventos…</p></div>
-      <div class="map-panel">
-        <div class="map-heading"><div><p class="eyebrow">EXPLORE NO MAPA</p><h3>Eventos pelo mapa</h3></div><p>Selecione um marcador para ver detalhes.</p></div>
-        <div id="map" role="application" aria-label="Mapa interativo de eventos públicos"></div>
-        <p class="map-credit">Mapa © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> · Mapas por Leaflet</p>
-      </div>
-    </section>
-
-    <section class="create-section" id="criar" aria-labelledby="create-heading">
-      <div class="create-intro"><p class="eyebrow">TIRE A IDEIA DO PAPEL</p><h2 id="create-heading">Seu evento começa<br><span>aqui.</span></h2><p>Preencha os detalhes, escolha um local no mapa e compartilhe com sua comunidade.</p><div class="create-note"><span aria-hidden="true">✳</span><p><strong>Feito para reunir.</strong><br>Organize os detalhes para que as pessoas certas encontrem seu evento.</p></div></div>
+    <section id="view-detalhes" class="view wrap detail-view" aria-labelledby="detail-title" hidden><a class="back-link" href="#explorar">← Voltar para explorar</a><div id="detail-content"></div></section>
+    <section id="view-criar" class="view wrap create-view" aria-labelledby="create-heading" hidden>
+      <p class="section-eyebrow">ORGANIZE ALGO INCRÍVEL</p><h1 id="create-heading">Criar novo evento <span>✦</span></h1><p class="page-subtitle">Preencha as informações e compartilhe com o mundo.</p>
       <form id="event-form" class="event-form">
-        <div class="form-title"><h3>Novo evento</h3><p>Campos com <span aria-hidden="true">*</span> são obrigatórios.</p></div>
-        <label for="title">Nome do evento <span aria-hidden="true">*</span><input id="title" name="title" required minlength="3" maxlength="120" placeholder="Ex.: Festival de música local"></label>
-        <label for="description">Descrição<textarea id="description" name="description" rows="3" maxlength="2000" placeholder="Conte o que as pessoas vão encontrar…"></textarea></label>
-        <div class="form-row">
-          <label for="date">Data e horário <span aria-hidden="true">*</span><input id="date" name="date" type="datetime-local" required></label>
-          <label for="category">Categoria<select id="category" name="category"><option>Cultura</option><option>Música</option><option>Educação</option><option>Comunidade</option><option>Esportes</option><option>Negócios</option><option>Geral</option></select></label>
-        </div>
-        <div class="form-row">
-          <label for="visibility">Visibilidade<select id="visibility" name="visibility"><option value="public">Público</option><option value="private">Privado (MVP)</option></select></label>
-          <label for="organizerEmail">E-mail do organizador<input id="organizerEmail" name="organizerEmail" type="email" autocomplete="email" placeholder="voce@exemplo.com"></label>
-        </div>
-        <label for="venue">Nome do local<input id="venue" name="venue" maxlength="120" placeholder="Ex.: Centro cultural"></label>
-        <label for="address">Endereço ou referência<input id="address" name="address" maxlength="240" placeholder="Clique no mapa para escolher as coordenadas"></label>
-        <div class="location-instructions"><span aria-hidden="true">⌖</span><p><strong>Marque o local do evento</strong><br>Clique no mapa para definir o ponto. As coordenadas são preenchidas automaticamente.</p></div>
-        <div id="pick-map" aria-label="Mapa para selecionar a localização do evento"></div>
-        <div class="form-row coordinate-row">
-          <label for="lat">Latitude <span aria-hidden="true">*</span><input id="lat" name="lat" type="number" step="any" required value="-5.0892"></label>
-          <label for="lng">Longitude <span aria-hidden="true">*</span><input id="lng" name="lng" type="number" step="any" required value="-42.8016"></label>
-        </div>
-        <button class="primary-button submit-button" type="submit">Publicar evento <span aria-hidden="true">↗</span></button>
-        <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        <label class="cover-picker" for="cover"><span aria-hidden="true">▧</span><strong>Adicione uma imagem de capa</strong><small>JPG, PNG ou WebP · até 1 MB</small><input id="cover" name="cover" type="file" accept="image/jpeg,image/png,image/webp"></label><div id="cover-preview" class="cover-preview" hidden></div>
+        <div class="field"><label for="title">Nome do evento <span aria-hidden="true">*</span></label><input id="title" name="title" required minlength="3" maxlength="120" placeholder="Ex.: Festival Universitário"></div>
+        <div class="field"><label for="description">Descrição <span aria-hidden="true">*</span></label><textarea id="description" name="description" rows="4" required maxlength="2000" placeholder="Conte um pouco sobre o evento..."></textarea></div>
+        <div class="form-row"><div class="field"><label for="date">Data <span aria-hidden="true">*</span></label><input id="date" name="date" type="date" required></div><div class="field"><label for="time">Horário <span aria-hidden="true">*</span></label><input id="time" name="time" type="time" required></div></div>
+        <div class="field"><label for="venue">Local <span aria-hidden="true">*</span></label><input id="venue" name="venue" required maxlength="160" placeholder="Nome do espaço ou endereço"></div>
+        <div class="field"><label for="category">Categoria</label><select id="category" name="category"><option value="">Selecione uma categoria</option><option>Música</option><option>Tecnologia</option><option>Cultura</option><option>Educação</option><option>Outros</option></select></div>
+        <fieldset class="visibility-field"><legend>Visibilidade</legend><label><input type="radio" name="visibility" value="public" checked><strong>Público</strong><span>Qualquer pessoa pode encontrar o evento.</span></label><label><input type="radio" name="visibility" value="private"><strong>Privado</strong><span>Disponível por link nesta demonstração local.</span></label></fieldset>
+        <details class="coordinates"><summary>Definir no mapa (opcional)</summary><p>Informe as coordenadas do local para exibir um mapa no detalhe.</p><div class="form-row"><div class="field"><label for="lat">Latitude</label><input id="lat" name="lat" type="number" step="any" min="-90" max="90" placeholder="Ex.: -5.0892"></div><div class="field"><label for="lng">Longitude</label><input id="lng" name="lng" type="number" step="any" min="-180" max="180" placeholder="Ex.: -42.8016"></div></div></details>
+        <p id="form-status" class="form-status" role="alert" aria-live="assertive"></p><button class="button button-primary submit-button" type="submit">Publicar evento</button>
       </form>
     </section>
-
-    <section class="subscribe-band" aria-labelledby="subscribe-heading">
-      <div><p class="eyebrow">FIQUE POR DENTRO</p><h2 id="subscribe-heading">Novidades que aproximam.</h2><p>Cadastre seu e-mail para demonstrar o fluxo de inscrição em notificações.</p></div>
-      <form id="subscribe-form" class="subscribe-form"><label for="subscriber-email" class="sr-only">Seu e-mail</label><input id="subscriber-email" type="email" required autocomplete="email" placeholder="Seu melhor e-mail"><button type="submit">Quero receber <span aria-hidden="true">→</span></button><p id="subscribe-status" role="status" aria-live="polite"></p></form>
-    </section>
+    <section id="view-meus" class="view wrap my-view" aria-labelledby="my-heading" hidden><div class="my-heading"><div><h1 id="my-heading">Meus eventos <span>♥</span></h1><p>Tudo o que você está organizando ou participando.</p></div><span class="profile-mark" aria-label="Participante Demo">♙</span></div><div class="tabs" role="tablist" aria-label="Meus eventos"><button id="tab-participando" type="button" role="tab" aria-selected="true" aria-controls="my-list">Participando</button><button id="tab-organizando" type="button" role="tab" aria-selected="false" aria-controls="my-list">Organizando</button></div><div id="my-list" role="tabpanel" aria-live="polite"></div></section>
+    <section id="view-sobre" class="view wrap about-view" aria-labelledby="about-heading" hidden><h1 id="about-heading">Sobre o EventSync</h1><p>Você está usando o modo demonstração. Eventos, presenças e notificações ficam salvos neste navegador. Não há login nem envio de e-mails.</p><p>Identidade local: <strong>Participante Demo</strong>.</p><button id="reset-demo" class="button button-outline" type="button">Restaurar dados de demonstração</button></section>
   </main>
-  <footer><a class="brand footer-brand" href="/">✳ conecta<span>eventos</span></a><p>Feito para aproximar pessoas e ideias.</p><p>© <span id="year"></span> Conecta Eventos · Projeto inicial</p></footer>
-  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <nav class="mobile-nav" aria-label="Navegação móvel"><a href="#explorar" data-nav="explorar"><span aria-hidden="true">◎</span>Explorar</a><a href="#criar" data-nav="criar"><span aria-hidden="true">⊕</span>Criar</a><a href="#meus" data-nav="meus"><span aria-hidden="true">▣</span>Meus</a><a href="#sobre" data-nav="sobre"><span aria-hidden="true">♙</span>Sobre</a></nav>
+  <footer class="wrap"><span>eventsync.</span><p>Encontre pessoas. Viva experiências.</p><small>Modo demonstração · Dados salvos neste navegador</small></footer><div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>
